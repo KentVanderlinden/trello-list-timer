@@ -2,7 +2,7 @@
 
 // Paste the API key from https://trello.com/power-ups/admin (Power-Up → API key).
 // It's a public key by design; it is safe to commit.
-export const API_KEY = 'PASTE_YOUR_API_KEY_HERE';
+export const API_KEY = '835fcd473a710097f73db27d94452d0b';
 export const APP_NAME = 'List Timer';
 
 export function isKeyConfigured() {
