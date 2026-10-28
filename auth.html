@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Authorize List Timer</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body>
+  <div id="root">
+    <p style="margin:0 0 12px">List Timer reads when cards moved between lists so it can add up the time. It only asks for <strong>read</strong> access and never changes your board.</p>
+    <button class="btn btn-primary btn-block" id="go" type="button">Authorize</button>
+  </div>
+  <script type="module">
+    import { connect, authorize, fit } from './js/ui.js';
+    const t = connect();
+    document.getElementById('go').addEventListener('click', async () => {
+      try { await authorize(t); t.closePopup(); } catch (e) { console.warn(e); }
+    });
+    fit(t, document.getElementById('root'));
+  </script>
+</body>
+</html>

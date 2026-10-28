@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>List Timer settings</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body>
+  <div id="root">
+    <div id="banner"></div>
+
+    <section>
+      <h2>Lists</h2>
+      <p class="hint">Switch on the lists you want to time. Star a list to show its time on the card itself; the others appear when you open a card.</p>
+      <ul class="lists" id="lists"></ul>
+    </section>
+
+    <section>
+      <h2>Count time</h2>
+      <div class="segmented" role="radiogroup" aria-label="When to count time">
+        <button type="button" role="radio" data-mode="24/7">Always (24/7)</button>
+        <button type="button" role="radio" data-mode="schedule">Set hours</button>
+      </div>
+      <p class="hint" id="mode-hint" style="margin-top:8px"></p>
+
+      <div class="schedule" id="schedule" hidden>
+        <div class="tz">
+          <span class="field-label">Time zone</span>
+          <select id="tz"></select>
+        </div>
+        <div class="days" id="days"></div>
+        <div class="schedule-actions">
+          <button type="button" class="link" id="copy-mon">Copy Monday's hours to Tue–Fri</button>
+          <span>Night shifts work too: 22:00 – 06:00 runs past midnight.</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">Saved</div>
+  </div>
+  <script type="module" src="./js/settings.js"></script>
+</body>
+</html>
