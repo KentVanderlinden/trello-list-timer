@@ -6,6 +6,7 @@ A Trello Power-Up that adds up how long each card has spent in the lists you cho
 - **Main lists** (star them, as many as you like) show their total right on the card, e.g. `⏱ Working on it · 3h 12m`. The badge turns colored while the card is in that list and updates every minute.
 - **Open a card** to see the "Time in lists" section with every tracked list: total time, number of visits, and whether the clock is running.
 - **Count 24/7 or only during set hours** (per weekday, with time zone; night shifts like 22:00–06:00 work).
+- **Fix mistakes.** Left a card in "Working on it" overnight? Open the card, hover the list in "Time in lists", click the pencil and type the real time. The correction is saved on the card (everyone on the board sees it), the row shows "Edited −8h", and *Undo edit* brings back the time from Trello's history. If the card is still in that list, the clock keeps running from the time you set.
 
 Times come from Trello's own record of card moves, so moves made on your phone, by teammates, or before you installed the Power-Up all count. Archived cards and cards moved to another board stop counting.
 
@@ -32,6 +33,7 @@ Everything is plain HTML/CSS/JS with no build step:
 | `js/history.js` | Fetches and caches the board's card-move history from the Trello API |
 | `js/intervals.js` | Turns that history into "in list X from A to B" intervals |
 | `js/time.js` | Totals, working-hours schedule math, duration formatting |
+| `js/adjust.js` | Manual time corrections stored on each card |
 | `js/stats.js` | Combines the above for one card |
 | `settings.html`, `js/settings.js` | Settings popup |
 | `card-section.html`, `js/card-section.js` | "Time in lists" section on the back of a card |

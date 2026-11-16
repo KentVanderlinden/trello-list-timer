@@ -5,6 +5,7 @@ import { loadConfig, isKeyConfigured, trackedIds, countingOf } from './config.js
 import { getBoardHistory, isAuthorized, NotAuthorizedError } from './history.js';
 import { buildTimeline } from './intervals.js';
 import { totalForList, isCountingNow } from './time.js';
+import { loadAdjustments, applyAdjustment } from './adjust.js';
 
 /**
  * Returns { status, ... }:
@@ -12,15 +13,18 @@ import { totalForList, isCountingNow } from './time.js';
  *  - 'not-authorized' the user needs to click Authorize
  *  - 'ok'             with { card, config, lists, rows, counting }
  * rows: one per tracked list, in board order:
- *   { id, name, main, total, visits, running }
+ *   { id, name, main, total, tracked, adjust, visits, running }
+ *   tracked = time from Trello's move history, adjust = manual correction (ms),
+ *   total = what we show (tracked + adjust, at least 0).
  */
 export async function cardStats(t, { now = Date.now() } = {}) {
   if (!isKeyConfigured()) return { status: 'no-key' };
-  const [card, board, config, lists] = await Promise.all([
+  const [card, board, config, lists, adjustments] = await Promise.all([
     t.card('id', 'idList', 'closed'),
     t.board('id'),
     loadConfig(t),
     t.lists('id', 'name'),
+    loadAdjustments(t),
   ]);
   if (!(await isAuthorized(t))) return { status: 'not-authorized', config, lists };
 
@@ -40,15 +44,24 @@ export async function cardStats(t, { now = Date.now() } = {}) {
 
   const counting = countingOf(config);
   const names = Object.fromEntries(lists.map((l) => [l.id, l.name]));
-  const rows = trackedIds(config, lists.map((l) => l.id)).map((id) => ({
-    id,
-    name: names[id],
-    main: !!config.lists[id].main,
-    label: config.lists[id].label || names[id],
-    total: totalForList(timeline.intervals, id, now, counting),
-    visits: timeline.visits[id] || 0,
-    running: timeline.currentList === id,
-  }));
+  const rows = trackedIds(config, lists.map((l) => l.id)).map((id) => {
+    const tracked = totalForList(timeline.intervals, id, now, counting);
+    const adjust = adjustments[id] || 0;
+    return {
+      id,
+      name: names[id],
+      main: !!config.lists[id].main,
+      label: config.lists[id].label || names[id],
+      total: applyAdjustment(tracked, adjust),
+      tracked,
+      adjust,
+      visits: timeline.visits[id] || 0,
+      running: timeline.currentList === id,
+    };
+  });
 
-  return { status: 'ok', card, config, lists, rows, counting, countingNow: isCountingNow(now, counting) };
+  return {
+    status: 'ok', card, config, lists, rows, adjustments, now,
+    counting, countingNow: isCountingNow(now, counting),
+  };
 }

@@ -24,6 +24,8 @@
         fri: { on: true, from: '09:00', to: '17:00' }, sat: { on: false, from: '09:00', to: '17:00' },
         sun: { on: false, from: '09:00', to: '17:00' } } },
     },
+    // ?edited=1: the card has a correction of -2h on "Working on it".
+    'card:shared:adjust': params.get('edited') ? { l2: -2 * H } : undefined,
   };
   const cardId = Math.floor((now - 30 * H) / 1000).toString(16) + '0000000000000000';
   const iso = (ms) => new Date(ms).toISOString();
@@ -49,6 +51,7 @@
     return {
       get: async (scope, vis, key) => stored[`${scope}:${vis}:${key}`],
       set: async (scope, vis, key, val) => { stored[`${scope}:${vis}:${key}`] = val; console.log('[mock] set', key, JSON.stringify(val)); },
+      remove: async (scope, vis, key) => { delete stored[`${scope}:${vis}:${key}`]; console.log('[mock] remove', key); },
       lists: async () => lists,
       board: async () => ({ id: 'board1' }),
       card: async () => ({ id: cardId, idList: 'l2', closed: false }),
