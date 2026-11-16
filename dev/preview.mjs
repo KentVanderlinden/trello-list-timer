@@ -37,19 +37,25 @@ const shots = [
   ['card-unauth', '/card-section.html?state=unauth', 560],
   ['card-empty', '/card-section.html?state=empty', 560],
   ['card-narrow', '/card-section.html', 320],
+  ['card-edited', '/card-section.html?edited=1', 560],
+  ['card-editing', '/card-section.html?edited=1', 560, async (page) => {
+    await page.hover('.time-row.running');
+    await page.click('.time-row.running .icon-btn');
+  }],
 ];
 const errors = [];
 for (const scheme of ['light', 'dark']) {
   const ctx = await browser.newContext({ colorScheme: scheme, viewport: { width: 560, height: 900 } });
   await ctx.route('https://p.trellocdn.com/power-up.min.js', (r) => r.fulfill({ path: path.join(root, 'dev/mock-trello.js'), contentType: 'text/javascript' }));
   await ctx.route('**/js/config.js', (r) => r.fulfill({ body: configSrc, contentType: 'text/javascript' }));
-  for (const [name, url, width] of shots) {
+  for (const [name, url, width, act] of shots) {
     const page = await ctx.newPage();
     page.on('pageerror', (e) => errors.push(`${name}: ${e.message}`));
     page.on('console', (m) => { if (m.type() === 'error') errors.push(`${name}: ${m.text()}`); });
     await page.setViewportSize({ width, height: 900 });
     await page.goto(base + url);
     await page.waitForTimeout(400);
+    if (act) { await act(page); await page.waitForTimeout(200); }
     const bg = scheme === 'dark' ? (name.startsWith('card') ? '#22272b' : '#282e33') : '#ffffff';
     await page.evaluate((c) => { document.body.style.background = c; document.body.style.padding = '12px'; }, bg);
     const h = await page.evaluate(() => document.getElementById('root').getBoundingClientRect().height + 24);
